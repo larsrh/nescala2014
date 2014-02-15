@@ -1,3 +1,5 @@
+slides.pdf
+
 *.acn
 *.acr
 *.alg
@@ -6,6 +8,7 @@
 *.blg
 *.dvi
 *.fdb_latexmk
+*.fls
 *.glg
 *.glo
 *.gls
