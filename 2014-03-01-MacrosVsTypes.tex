@@ -4,6 +4,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{tikz}
+\usepackage[overlay,absolute]{textpos}
 
 \usetheme{nescala}
 \setbeamercovered{transparent}
@@ -336,13 +337,13 @@ trait GenTraversableLike \{
 \}
   \end{semiverbatim}
   \end{exampleblock}
-\end{frame}
 
-\begin{frame}[fragile]{Let's overthrow the tyranny of types... NOT!}
-  \begin{center}
-    % from https://upload.wikimedia.org/wikipedia/commons/7/79/Operation_Upshot-Knothole_-_Badger_001.jpg
-    \includegraphics[height=8cm]{img/boom.jpg}
-  \end{center}
+  \begin{textblock*}{\textwidth}(20mm,10mm)
+    \begin{visibleenv}<2->
+      % from https://upload.wikimedia.org/wikipedia/commons/7/79/Operation_Upshot-Knothole_-_Badger_001.jpg
+      \includegraphics[height=8cm]{img/boom.jpg}
+    \end{visibleenv}
+  \end{textblock*}
 \end{frame}
 
 \begin{frame}[fragile]{Sane use case: Checked arithmetics}
