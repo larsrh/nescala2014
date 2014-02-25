@@ -61,25 +61,25 @@
 \begin{frame}{Types \'a la Scala}
   Scala has a sophisticated type system
   \begin{itemize}
-    \item path-dependent types
-    \item type projections
-    \item higher-kinded types
-    \item implicits
+    \item Path-dependent types
+    \item Type projections
+    \item Higher-kinded types
+    \item Implicits
   \end{itemize}
 \end{frame}
 
 \begin{frame}{Type computations}
-  implicits allow computations in the type system
+  Implicits allow computations in the type system
 
   \begin{itemize}
-    \item higher-order unification (SI-2712)
-    \item generic operations on tuples
-    \item extensible records
-    \item statically size-checked collections
+    \item Higher-order unification (SI-2712)
+    \item Generic operations on tuples
+    \item Extensible records
+    \item Statically size-checked collections
   \end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{Type Computations}{Example: Sized collections}
+\begin{frame}[fragile]{Type computations}{Example: Sized collections}
   \begin{verbatim}
 // typed as Sized[_2, List[String]]
 val hdrs = Sized("Title", "Author")
@@ -94,7 +94,7 @@ val rows = List(
 
 \demoslide
 
-\begin{frame}{The Power of Type Computation}
+\begin{frame}{The power of type computation}
   Computing with implicits is sometimes called ``Poor Man's Prolog''
   \vspace{1em}
 
@@ -104,22 +104,22 @@ val rows = List(
 % <https://secure.flickr.com/photos/mszeto/3261725397/>
 \fullpicture{img/hanoi.jpg}
 
-\begin{frame}{How Can Macros Help?}
+\begin{frame}{How can macros help?}
   \begin{itemize}
-    \item type system covers many properties
-    \item complex type computations are hard to debug
+    \item Type system covers many properties
+    \item Complex type computations are hard to debug
 
       (sometimes, \texttt{-Xlog-implicits} is not enough)
-    \item implicit-heavy code slows down compiler significantly
-    \item our advice:
+    \item Implicit-heavy code slows down compiler significantly
+    \item Our advice:
       \begin{itemize}
-        \item types whenever possible
-        \item macros when it becomes too heavyweight
+        \item Types whenever possible
+        \item Macros when it becomes too heavyweight
       \end{itemize}
   \end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{Use Case: Checked Arithmetics}
+\begin{frame}[fragile]{Use case: Checked arithmetics}
   Spire provides a \texttt{checked} macro to detect arithmetic overflows
 
   \vspace{1em}
@@ -138,12 +138,12 @@ Checked.option {
 \end{center}
 \end{frame}
 
-\begin{frame}[fragile]{(Textual) Code Generation}{Example: Parser Generators}
+\begin{frame}[fragile]{(Textual) code generation}{Example: Parser generators}
   % from Tom Niemann <epaperpress.com>
   \includegraphics[width=\linewidth]{img/yacc.png}
 \end{frame}
 
-\begin{frame}{Code Generation}
+\begin{frame}{Code generation}
   Almost every language has it\only<1>{.}\visible<2->{, even Haskell:}
 
   \begin{visibleenv}<2->
@@ -163,15 +163,15 @@ Checked.option {
   \end{visibleenv}
 \end{frame}
 
-\begin{frame}{Type Classes in Scala}
+\begin{frame}{Type classes in Scala}
   \begin{itemize}
-    \item type classes are (first-class) traits
-    \item instances are (first-class) values
-    \item<visible@2> both can use arbitrary language features
+    \item Type classes are (first-class) traits
+    \item Instances are (first-class) values
+    \item<visible@2> Both can use arbitrary language features
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Use Case: Materialization}
+\begin{frame}{Use case: Materialization}
   We want to have: default instances for type classes
   \begin{itemize}
     \item \texttt{Semigroup} (pointwise addition)
@@ -186,21 +186,21 @@ Checked.option {
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Use Case: Materialization}
+\begin{frame}{Use case: Materialization}
   \texttt{scalac} already synthesizes \texttt{equals}, \texttt{toString} ...
 
   \vspace{1em}
   \begin{alertblock}{Problem}
-    not based on Type Classes
+    Not based on type classes
   \end{alertblock}
 
   \vspace{1em}
   \begin{exampleblock}{Solution}
-    materialization based on implicit macros
+    Materialization based on implicit macros
   \end{exampleblock}
 \end{frame}
 
-\begin{frame}[fragile]{Use Case: Materialization}
+\begin{frame}[fragile]{Use case: Materialization}
   \begin{verbatim}
 implicit def derive[C[_] : TypeClass, T]: C[T] =
   macro TypeClass.derive_impl[C, T]
@@ -209,14 +209,14 @@ implicit def derive[C[_] : TypeClass, T]: C[T] =
 
 \demoslide
 
-\begin{frame}{The Power of Materialization}
+\begin{frame}{The power of materialization}
   \begin{itemize}
-    \item similar to \texttt{deriving Eq} in Haskell
-    \item extensible without modifying the macro(s) itself
+    \item Similar to \texttt{deriving Eq} in Haskell
+    \item Extensible without modifying the macro(s) itself
   \end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{The Dangers of Materialization}
+\begin{frame}[fragile]{The dangers of materialization}
   Whitebox macros allow us to write this:
   \vspace{1em}
 
@@ -226,20 +226,20 @@ implicit def deriveAnything: Any =
   \end{verbatim}
 \end{frame}
 
-\begin{frame}{Macros and Code Generation}
+\begin{frame}{Macros and code generation}
   \begin{block}{Advice}
     \begin{itemize}
-      \item don't abandon typing discipline
-      \item prefer vanilla Scala
-      \item try to encapsulate only the ``moving parts'' into a macro
+      \item Don't abandon typing discipline
+      \item Prefer vanilla Scala
+      \item Try to encapsulate only the ``moving parts'' into a macro
 
         (maybe more boilerplate, but more predictable)
-      \item try to constrain the types of the macros as much as possible
+      \item Try to constrain the types of the macros as much as possible
     \end{itemize}
   \end{block}
   \vspace{1em}
 
-  \begin{block}{Open Problems}
+  \begin{block}{Open problems}
     Best practices for documentation \& testing
     \vspace{1em}
 
