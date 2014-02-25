@@ -44,6 +44,178 @@
 \end{frame}
 }
 
+\begin{frame}{Macros vs types}
+  \begin{itemize}
+  \item Types have been used to metaprogram Scala for ages
+  \item Macros are the new player on the field
+  \item Debates are hot in the IRC and on Twitter
+  \item Time to figure out who's the best once and for all!
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Let the games begin!}
+  Following the \text{\color{blue}\href{http://scalamacros.org/paperstalks/2014-02-04-WhatAreMacrosGoodFor.pdf}{"What are macros good for?"}} talk, we will see how the contenders fare in three disciplines:
+
+  \vspace{1em}
+  \begin{itemize}
+  \item Code generation
+  \item Static checks
+  \item Domain-specific languages
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+\vskip40pt
+\begin{center}
+\text{\color{blue}{\Large{Code generation}}}
+\end{center}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Code generation}
+  Every language ecosystem has it.
+\end{frame}
+
+\begin{frame}[fragile]{Textual code generation (low tech)}{Example: Parser generators}
+  % from Tom Niemann <epaperpress.com>
+  \includegraphics[width=\linewidth]{img/yacc.png}
+\end{frame}
+
+\begin{frame}{Integrated code generation (high tech)}{Example: Template Haskell}
+  \begin{itemize}
+    \item \texttt{lens}
+
+       derive lenses for fields of a data type
+    \item \texttt{yesod}
+
+      templating, routing
+    \item \texttt{invertible-syntax}
+
+      constructing partial isomorphisms for constructors
+
+    \item ... more examples in the TH paper
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Code generation \'a la Scala}
+  \begin{itemize}
+  \item Even though textual code generation remains popular
+  \item Macros are becoming the tool of choice in a lot of situations
+    \begin{itemize}
+    \item Term generation works quite well
+    \item Type generation has a number of approaches and prototypes
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{What about types?}
+  \begin{itemize}
+  \item Scala's type system is Turing-complete
+  \item This enables some form of code generation
+  \item But it's neither straightforward, nor really powerful
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Macros + types}
+  \begin{itemize}
+  \item With macros code generation is acessible and fun
+  \item But we don't have to do that mindlessly
+  \item Types make things better
+  \item And metaprogramming is not an exception
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Use case: Materialization}
+  We want to have: default implementations for
+  \begin{itemize}
+    \item \texttt{\color{red}{Semigroup}} (pointwise addition)
+    \item \texttt{Ordering} (lexicographic order)
+    \item \texttt{Binary} (pickling/unpickling)
+  \end{itemize}
+
+  \vspace{1em}
+  We do not want to: write boilerplate
+  \begin{itemize}
+    \item repetitive \& error-prone
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Use case: Materialization}
+  \texttt{scalac} already synthesizes \texttt{equals}, \texttt{toString} ...
+
+  \vspace{1em}
+  \begin{alertblock}{Problem}
+    Not extensible
+  \end{alertblock}
+
+  \vspace{1em}
+  \begin{exampleblock}{Solution}
+    Materialization based on type classes and implicit macros
+  \end{exampleblock}
+\end{frame}
+
+\begin{frame}{Type classes \'a la Scala}
+  \begin{itemize}
+    \item Type classes are (first-class) traits
+    \item Instances are (first-class) values
+    \item<visible@2> Both can use arbitrary language features
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Use case: Materialization}
+  \begin{verbatim}
+implicit def derive[C[_] : TypeClass, T]: C[T] =
+  macro TypeClass.derive_impl[C, T]
+  \end{verbatim}
+\end{frame}
+
+% \demoslide
+
+\begin{frame}{The power of materialization}
+  \begin{itemize}
+    \item First introduced in Shapeless
+    \item Similar to \texttt{deriving Eq} in Haskell
+    \item Extensible without modifying the macro(s) itself
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{The dangers of materialization}
+  \vspace{1em}
+  \begin{alertblock}{Bad}
+  \begin{verbatim}
+implicit def derive[C[_], T]: C[T] =
+  macro TypeClass.derive_impl[C, T]
+  \end{verbatim}
+  \end{alertblock}
+
+  \vspace{1em}
+  \begin{exampleblock}{Good}
+  \begin{semiverbatim}
+implicit def derive[C[_] : \text{\color{blue}{TypeClass}}, T]: C[T] =
+  macro TypeClass.derive_impl[C, T]
+  \end{semiverbatim}
+  \end{exampleblock}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Our advice}
+  \begin{itemize}
+    \item Metaprogramming is powerful
+    \item But it is also hard, so prefer programming
+    \item Try to constrain the types of the macros as much as possible
+    \item Try to encapsulate only the ``moving parts'' into a macro
+
+      (maybe more boilerplate, but more predictable)
+  \end{itemize}
+\end{frame}
+
+% \begin{block}{Open problems}
+%   Best practices for documentation \& testing
+%   \vspace{1em}
+%   Do we need a compile-time ScalaCheck?
+% \end{block}
+
 \begin{frame}
 \vskip40pt
 \begin{center}
@@ -175,150 +347,6 @@ Checked.option {
   \item Type classes to encapsulate the magic
   \end{itemize}
 \end{frame}
-
-\begin{frame}
-\vskip40pt
-\begin{center}
-\text{\color{blue}{\Large{Code generation}}}
-\end{center}
-\end{frame}
-
-\begin{frame}[fragile]
-\frametitle{Code generation}
-  Every language ecosystem has it.
-\end{frame}
-
-\begin{frame}[fragile]{Textual code generation (low tech)}{Example: Parser generators}
-  % from Tom Niemann <epaperpress.com>
-  \includegraphics[width=\linewidth]{img/yacc.png}
-\end{frame}
-
-\begin{frame}{Integrated code generation (high tech)}{Example: Template Haskell}
-  \begin{itemize}
-    \item \texttt{lens}
-
-       derive lenses for fields of a data type
-    \item \texttt{yesod}
-
-      templating, routing
-    \item \texttt{invertible-syntax}
-
-      constructing partial isomorphisms for constructors
-
-    \item ... more examples in the TH paper
-  \end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]
-\frametitle{Code generation \'a la Scala}
-  \begin{itemize}
-  \item Even though textual code generation remains popular
-  \item Macros are becoming the tool of choice in a lot of situations
-    \begin{itemize}
-    \item Term generation works quite well
-    \item Type generation has a number of approaches and prototypes
-    \end{itemize}
-  \end{itemize}
-\end{frame}
-
-\begin{frame}{Types aren't going anywhere!}
-  \begin{itemize}
-  \item With macros code generation is accessible and fun
-  \item But we don't have to do that mindlessly
-  \item Types make things better
-  \item And metaprogramming is not an exception
-  \end{itemize}
-\end{frame}
-
-\begin{frame}{Use case: Materialization}
-  We want to have: default implementations for
-  \begin{itemize}
-    \item \texttt{\color{red}{Semigroup}} (pointwise addition)
-    \item \texttt{Ordering} (lexicographic order)
-    \item \texttt{Binary} (pickling/unpickling)
-  \end{itemize}
-
-  \vspace{1em}
-  We do not want to: write boilerplate
-  \begin{itemize}
-    \item repetitive \& error-prone
-  \end{itemize}
-\end{frame}
-
-\begin{frame}{Use case: Materialization}
-  \texttt{scalac} already synthesizes \texttt{equals}, \texttt{toString} ...
-
-  \vspace{1em}
-  \begin{alertblock}{Problem}
-    Not extensible
-  \end{alertblock}
-
-  \vspace{1em}
-  \begin{exampleblock}{Solution}
-    Materialization based on type classes and implicit macros
-  \end{exampleblock}
-\end{frame}
-
-\begin{frame}{Type classes \'a la Scala}
-  \begin{itemize}
-    \item Type classes are (first-class) traits
-    \item Instances are (first-class) values
-    \item<visible@2> Both can use arbitrary language features
-  \end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]{Use case: Materialization}
-  \begin{verbatim}
-implicit def derive[C[_] : TypeClass, T]: C[T] =
-  macro TypeClass.derive_impl[C, T]
-  \end{verbatim}
-\end{frame}
-
-% \demoslide
-
-\begin{frame}{The power of materialization}
-  \begin{itemize}
-    \item First introduced in Shapeless
-    \item Similar to \texttt{deriving Eq} in Haskell
-    \item Extensible without modifying the macro(s) itself
-  \end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]{The dangers of materialization}
-  \vspace{1em}
-  \begin{alertblock}{Bad}
-  \begin{verbatim}
-implicit def derive[C[_], T]: C[T] =
-  macro TypeClass.derive_impl[C, T]
-  \end{verbatim}
-  \end{alertblock}
-
-  \vspace{1em}
-  \begin{exampleblock}{Good}
-  \begin{semiverbatim}
-implicit def derive[C[_] : \text{\color{blue}{TypeClass}}, T]: C[T] =
-  macro TypeClass.derive_impl[C, T]
-  \end{semiverbatim}
-  \end{exampleblock}
-\end{frame}
-
-\begin{frame}[fragile]
-\frametitle{Our advice}
-  \begin{itemize}
-    \item Metaprogramming is powerful
-    \item But it is also hard, so prefer programming
-    \item Try to constrain the types of the macros as much as possible
-    \item Try to encapsulate only the ``moving parts'' into a macro
-
-      (maybe more boilerplate, but more predictable)
-  \end{itemize}
-\end{frame}
-
-% \begin{block}{Open problems}
-%   Best practices for documentation \& testing
-%   \vspace{1em}
-%   Do we need a compile-time ScalaCheck?
-% \end{block}
 
 \begin{frame}
 \vskip40pt
