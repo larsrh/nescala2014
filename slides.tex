@@ -114,16 +114,11 @@ val rows = List(
 
 \begin{frame}{How can macros help?}
   \begin{itemize}
-    \item Type system covers many properties \text{\color{red}{What did you mean here?}}
+    \item Type system doesn't cover everything
     \item Complex type computations are hard to debug
 
       (sometimes, \texttt{-Xlog-implicits} is not enough)
     \item Implicit-heavy code slows down compiler significantly
-    \item Our advice:
-      \begin{itemize}
-        \item Types whenever possible
-        \item Macros when it becomes too heavyweight
-      \end{itemize}
   \end{itemize}
 \end{frame}
 
@@ -137,6 +132,18 @@ Checked.option {
   x + y < z
 }
   \end{verbatim}
+\end{frame}
+
+\begin{frame}{Use case: Example of short-circuiting computations with macros}
+  What would be the best example from shapeless here?
+\end{frame}
+
+\begin{frame}{Our advice}
+  \begin{itemize}
+  \item Types whenever possible
+  \item Macros if it becomes too heavyweight
+  \item Implicits to encapsulate the magic
+  \end{itemize}
 \end{frame}
 
 \begin{frame}
