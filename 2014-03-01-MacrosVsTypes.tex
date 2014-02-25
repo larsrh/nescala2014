@@ -81,6 +81,8 @@
   \includegraphics[width=\linewidth]{img/yacc.png}
 \end{frame}
 
+% Need to explain why this is low-tech and why we need a high-level tool for that
+
 \begin{frame}{Integrated code generation (high tech)}{Example: Template Haskell}
   \begin{itemize}
     \item \texttt{lens}
@@ -100,14 +102,18 @@
 \begin{frame}[fragile]
 \frametitle{Code generation \'a la Scala}
   \begin{itemize}
-  \item Even though textual code generation remains popular
   \item Macros are becoming the tool of choice in a lot of situations
     \begin{itemize}
     \item Term generation works quite well
     \item Type generation has a number of approaches and prototypes
+    \item A lot of popular libraries are using macros
     \end{itemize}
   \end{itemize}
 \end{frame}
+
+% Needs a good example here that shows that macros are really useful
+% I'd use the specialized[T] example from what are macros good for
+% But I'm a bit sick of it. Will try to think of something else
 
 \begin{frame}{What about types?}
   \begin{itemize}
