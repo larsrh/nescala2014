@@ -122,8 +122,38 @@ val rows = List(
   \end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{Use case: Checked arithmetics}
-  Spire provides a \texttt{checked} macro to detect arithmetic overflows
+\begin{frame}[fragile]{Let's overthrow the tyranny of types!}
+  Macros can do anything, including validation of arguments,
+  so we shouldn't bother with all those complex types anymore
+
+  \vspace{1em}
+  \begin{alertblock}{Bad}
+  \begin{verbatim}
+trait GenTraversableLike[+A, +Repr] {
+  def map[B, That](f: A => B)
+    (implicit bf: CanBuildFrom[Repr, B, That]): That
+}\end{verbatim}
+  \end{alertblock}
+
+  \begin{exampleblock}{Good}
+  \begin{semiverbatim}
+trait GenTraversableLike \{
+  def map(f: Any => Any): Any = \text{\color{blue}{macro}} impl
+\}
+  \end{semiverbatim}
+  \end{exampleblock}
+\end{frame}
+
+\begin{frame}[fragile]{Let's overthrow the tyranny of types... NOT!}
+  \begin{center}
+    % from https://upload.wikimedia.org/wikipedia/commons/7/79/Operation_Upshot-Knothole_-_Badger_001.jpg
+    \includegraphics[height=8cm]{img/boom.jpg}
+  \end{center}
+\end{frame}
+
+\begin{frame}[fragile]{Sane use case: Checked arithmetics}
+  Spire provides a \texttt{checked} macro to detect arithmetic overflows.
+  Types can't capture this, so it's okay to use a macro here.
 
   \vspace{1em}
   \begin{verbatim}
@@ -134,15 +164,15 @@ Checked.option {
   \end{verbatim}
 \end{frame}
 
-\begin{frame}{Use case: Example of short-circuiting computations with macros}
+\begin{frame}{Sane use case: Example of short-circuiting computations with macros}
   What would be the best example from shapeless here?
 \end{frame}
 
 \begin{frame}{Our advice}
   \begin{itemize}
   \item Types whenever possible
-  \item Macros if it becomes too heavyweight
-  \item Implicits to encapsulate the magic
+  \item Macros if impossible or heavyweight
+  \item Type classes to encapsulate the magic
   \end{itemize}
 \end{frame}
 
