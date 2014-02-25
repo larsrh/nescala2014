@@ -248,6 +248,7 @@ implicit def derive[C[_] : TypeClass, T]: C[T] =
 
 \begin{frame}{The power of materialization}
   \begin{itemize}
+    \item First introduced in Shapeless
     \item Similar to \texttt{deriving Eq} in Haskell
     \item Extensible without modifying the macro(s) itself
   \end{itemize}
