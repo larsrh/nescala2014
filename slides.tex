@@ -272,26 +272,23 @@ implicit def derive[C[_] : \text{\color{blue}{TypeClass}}, T]: C[T] =
   \end{exampleblock}
 \end{frame}
 
-\begin{frame}{Macros and code generation}
-  \begin{block}{Advice}
-    \begin{itemize}
-      \item Don't abandon typing discipline
-      \item Prefer vanilla Scala
-      \item Try to encapsulate only the ``moving parts'' into a macro
+\begin{frame}[fragile]
+\frametitle{Our advice}
+  \begin{itemize}
+    \item Metaprogramming is powerful
+    \item But it is also hard, so prefer programming
+    \item Try to constrain the types of the macros as much as possible
+    \item Try to encapsulate only the ``moving parts'' into a macro
 
-        (maybe more boilerplate, but more predictable)
-      \item Try to constrain the types of the macros as much as possible
-    \end{itemize}
-  \end{block}
-  \vspace{1em}
-
-  \begin{block}{Open problems}
-    Best practices for documentation \& testing
-    \vspace{1em}
-
-    Do we need a compile-time ScalaCheck?
-  \end{block}
+      (maybe more boilerplate, but more predictable)
+  \end{itemize}
 \end{frame}
+
+% \begin{block}{Open problems}
+%   Best practices for documentation \& testing
+%   \vspace{1em}
+%   Do we need a compile-time ScalaCheck?
+% \end{block}
 
 \begin{frame}
 \vskip40pt
