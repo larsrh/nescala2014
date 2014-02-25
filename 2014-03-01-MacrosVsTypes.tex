@@ -8,15 +8,6 @@
 \usetheme{nescala}
 \setbeamercovered{transparent}
 
-\newcommand\demoslide{
-  {
-    \setbeamertemplate{background}{}
-    \begin{frame}[plain]
-      \begin{center}\Large\bfseries Demo\end{center}
-    \end{frame}
-  }
-}
-
 \newcommand\fullpicture[1]{
   {
     \setbeamertemplate{background}{}
@@ -206,8 +197,6 @@ implicit def derive[C[_] : TypeClass, T]: C[T] =
   \end{verbatim}
 \end{frame}
 
-% \demoslide
-
 \begin{frame}{The power of materialization}
   \begin{itemize}
     \item First introduced in Shapeless
@@ -304,8 +293,6 @@ val rows = List(
 
   \color{red}{Maybe collection operation on tuples or records? These are my personal favorites in Shapeless.}
 \end{frame}
-
-% \demoslide
 
 \begin{frame}{The power of type computation}
   Computing with implicits is sometimes called ``Poor Man's Prolog''
