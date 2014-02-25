@@ -73,18 +73,9 @@
 
 \begin{frame}[fragile]
 \frametitle{Code generation}
-  Every language ecosystem has it.
-\end{frame}
-
-\begin{frame}[fragile]{Textual code generation (low tech)}{Example: Parser generators}
-  % from Tom Niemann <epaperpress.com>
-  \includegraphics[width=\linewidth]{img/yacc.png}
-\end{frame}
-
-% Need to explain why this is low-tech and why we need a high-level tool for that
-
-\begin{frame}{Integrated code generation (high tech)}{Example: Template Haskell}
-  \begin{itemize}
+  Every language ecosystem has it\only<2>{, even Haskell
+  \vspace{1em}
+    \begin{itemize}
     \item \texttt{lens}
 
        derive lenses for fields of a data type
@@ -94,38 +85,78 @@
     \item \texttt{invertible-syntax}
 
       constructing partial isomorphisms for constructors
-
-    \item ... more examples in the TH paper
   \end{itemize}
+  }
+\end{frame}
+
+\begin{frame}[fragile]{Textual code generation}{Example: Parser generators}
+  % from Tom Niemann <epaperpress.com>
+  \includegraphics[width=\linewidth]{img/yacc.png}
 \end{frame}
 
 \begin{frame}[fragile]
-\frametitle{Code generation \'a la Scala}
+\frametitle{Textual codegen is too low-tech}
   \begin{itemize}
-  \item Macros are becoming the tool of choice in a lot of situations
-    \begin{itemize}
-    \item Term generation works quite well
-    \item Type generation has a number of approaches and prototypes
-    \item A lot of popular libraries are using macros
-    \end{itemize}
+  \item Easy to mess up when concatenating strings
+  \item Little knowledge about the program being compiled
+  \item We need a better solution!
   \end{itemize}
 \end{frame}
 
-% Needs a good example here that shows that macros are really useful
-% I'd use the specialized[T] example from what are macros good for
-% But I'm a bit sick of it. Will try to think of something else
-
-\begin{frame}{What about types?}
+\begin{frame}{Enter types}
   \begin{itemize}
   \item Scala's type system is Turing-complete
   \item This enables some form of code generation
-  \item But it's neither straightforward, nor really powerful
+  \item But it's not particularly straightforward
   \end{itemize}
+\end{frame}
+
+% Do we want to provide an example here?
+
+\begin{frame}{Enter macros}
+  \begin{itemize}
+  \item Functions that are run at compile time
+  \item Operate on abstract syntax trees not on strings
+  \item Communicate with compiler to learn things about the program
+  \item A lot of popular Scala libraries are already using macros
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Use case: Specialization}
+  Specialization helps with writing high-performance code,
+  but it bloats the code significantly.
+
+  \vspace{1em}
+  \begin{verbatim}
+def createArray[@specialized T](size: Int, el: T) = {
+  val a = new Array[T](size)
+  for (i <- 0 until size) a(i) = el
+  a
+}
+  \end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]{Use case: Specialization}
+  With macros we can write a specialization code generator ourselves,
+  having fine-grained control over what we're specializing.
+
+  \vspace{1em}
+  \begin{semiverbatim}
+def specialized[T: ClassTag](code: => T) = macro ...
+
+def createArray[T: ClassTag](size: Int, el: T) = \{
+  val a = new Array[T](size)
+  \text{\color{blue}{specialized[T] \{}}
+    for (i <- 0 until size) a(i) = el
+  \text{\color{blue}{\}}}
+  a
+\}
+  \end{semiverbatim}
 \end{frame}
 
 \begin{frame}{Macros + types}
   \begin{itemize}
-  \item With macros code generation is acessible and fun
+  \item With macros code generation becomes acessible and fun
   \item But we don't have to do that mindlessly
   \item Types make things better
   \item And metaprogramming is not an exception
