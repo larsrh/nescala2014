@@ -255,13 +255,21 @@ implicit def derive[C[_] : TypeClass, T]: C[T] =
 \end{frame}
 
 \begin{frame}[fragile]{The dangers of materialization}
-  Whitebox macros allow us to write this:
   \vspace{1em}
-
+  \begin{alertblock}{Bad}
   \begin{verbatim}
-implicit def deriveAnything: Any =
-  macro derive_impl
+implicit def derive[C[_], T]: C[T] =
+  macro TypeClass.derive_impl[C, T]
   \end{verbatim}
+  \end{alertblock}
+
+  \vspace{1em}
+  \begin{exampleblock}{Good}
+  \begin{semiverbatim}
+implicit def derive[C[_] : \text{\color{blue}{TypeClass}}, T]: C[T] =
+  macro TypeClass.derive_impl[C, T]
+  \end{semiverbatim}
+  \end{exampleblock}
 \end{frame}
 
 \begin{frame}{Macros and code generation}
