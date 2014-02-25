@@ -200,16 +200,8 @@ Checked.option {
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Type classes in Scala}
-  \begin{itemize}
-    \item Type classes are (first-class) traits
-    \item Instances are (first-class) values
-    \item<visible@2> Both can use arbitrary language features
-  \end{itemize}
-\end{frame}
-
 \begin{frame}{Use case: Materialization}
-  We want to have: default instances for type classes
+  We want to have: default implementations for
   \begin{itemize}
     \item \texttt{\color{red}{Semigroup}} (pointwise addition)
     \item \texttt{Ordering} (lexicographic order)
@@ -228,13 +220,21 @@ Checked.option {
 
   \vspace{1em}
   \begin{alertblock}{Problem}
-    Not based on type classes
+    Not extensible
   \end{alertblock}
 
   \vspace{1em}
   \begin{exampleblock}{Solution}
-    Materialization based on implicit macros
+    Materialization based on type classes and implicit macros
   \end{exampleblock}
+\end{frame}
+
+\begin{frame}{Type classes \'a la Scala}
+  \begin{itemize}
+    \item Type classes are (first-class) traits
+    \item Instances are (first-class) values
+    \item<visible@2> Both can use arbitrary language features
+  \end{itemize}
 \end{frame}
 
 \begin{frame}[fragile]{Use case: Materialization}
