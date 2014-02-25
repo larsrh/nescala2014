@@ -153,29 +153,30 @@ Checked.option {
 \end{center}
 \end{frame}
 
-\begin{frame}[fragile]{(Textual) code generation}{Example: Parser generators}
+\begin{frame}[fragile]
+\frametitle{Code generation}
+  Every language ecosystem has it.
+\end{frame}
+
+\begin{frame}[fragile]{Textual code generation (low tech)}{Example: Parser generators}
   % from Tom Niemann <epaperpress.com>
   \includegraphics[width=\linewidth]{img/yacc.png}
 \end{frame}
 
-\begin{frame}{Code generation}
-  Almost every language has it\only<1>{.}\visible<2->{, even Haskell:}
+\begin{frame}{Integrated code generation (high tech)}{Example: Template Haskell}
+  \begin{itemize}
+    \item \texttt{lens}
 
-  \begin{visibleenv}<2->
-    \begin{itemize}
-      \item \texttt{lens}
+       derive lenses for fields of a data type
+    \item \texttt{yesod}
 
-         derive lenses for fields of a data type
-      \item \texttt{yesod}
+      templating, routing
+    \item \texttt{invertible-syntax}
 
-        templating, routing
-      \item \texttt{invertible-syntax}
+      constructing partial isomorphisms for constructors
 
-        constructing partial isomorphisms for constructors
-
-      \item ... more examples in the TH paper
-    \end{itemize}
-  \end{visibleenv}
+    \item ... more examples in the TH paper
+  \end{itemize}
 \end{frame}
 
 \begin{frame}{Type classes in Scala}
