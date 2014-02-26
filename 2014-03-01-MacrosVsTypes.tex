@@ -157,7 +157,7 @@ def createArray[T: ClassTag](size: Int, el: T) = \{
 \begin{frame}{Macros + types}
   \begin{itemize}
     \item With macros, code generation becomes accessible and fun
-    \item But: macros are essentially opaque to the reader
+    \item But: Macros are essentially opaque to the reader
     \item We can and should try to alleviate this with types
   \end{itemize}
 \end{frame}
@@ -460,8 +460,8 @@ Query(Coffees) filter
   \vspace{1em}
   \begin{verbatim}
 Query(Coffees) map (c =>
-  if (c.origin == "Iran") "Good" // String
-  else c.quality                 // Int
+  if (c.origin === "Iran") "Good"
+  else c.quality
 )\end{verbatim}
 
   \vspace{1em}
@@ -470,6 +470,7 @@ Query(Coffees) map (c =>
   \item Don’t know how to unpack Any to T and pack to G
   \item not enough arguments for method map: (implicit shape: scala.slick.lifted.Shape[Any,T,G])
   scala.slick.lifted.Query[G,T]. Unspecified value parameter
+  \item This happens because ifs aren't supported by lifted embedding
   \end{itemize}
 \end{frame}
 
@@ -482,7 +483,7 @@ Query(Coffees) map (c =>
 case class Coffee(id: Int, name: String, ...)
 
 Query[Coffee] filter
-  (c => c.id: \text{\color{blue}{Int}} === 10: \text{\color{blue}{Int}}) map
+  (c => c.id: \text{\color{blue}{Int}} == 10: \text{\color{blue}{Int}}) map
   (c => c.name: \text{\color{blue}{String}})
   \end{semiverbatim}
 \end{frame}
@@ -521,6 +522,77 @@ def idIsTen(c: Coffee) = c.id == 10
 Query[Coffee] filter \text{\color{blue}{idIsTen}}
     \end{semiverbatim}
   \end{alertblock}
+\end{frame}
+
+\begin{frame}[fragile]{Shadow embedding (macros + types)}
+  Based on YinYang, which uses macros, and that means that
+  type signatures stay simple and error messages are comprehensible
+
+  \vspace{1em}
+  \begin{semiverbatim}
+case class Coffee(id: Int, name: String, ...)
+
+slick \{
+  Query[Coffee] filter
+    (c => c.id: \text{\color{blue}{Int}} == 10: \text{\color{blue}{Int}}) map
+    (c => c.name: \text{\color{blue}{String}})
+  \}
+\}\end{semiverbatim}
+\end{frame}
+
+\begin{frame}[fragile]{Shadow embedding (macros + types)}
+  However the API that is available inside \texttt{slick} blocks
+  is moderated by the DSL author and then checked by the macro
+
+  \vspace{1em}
+  \begin{semiverbatim}
+  \text{\color{red}{Need an example from Vojin here}}
+  \end{semiverbatim}
+\end{frame}
+
+\begin{frame}[fragile]{Shadow embedding (macros + types)}
+  By combining facilities for static checking provided by both macros and types,
+  we get comprehensible and comprehensive errors
+
+  \vspace{1em}
+  \begin{semiverbatim}
+slick \{
+  Query[Coffee] map
+    (c => c.id\text{\color{blue}{.toDouble}})
+\}\end{semiverbatim}
+
+  \vspace{1em}
+  Compiling the code above produces the correct error
+  \begin{itemize}
+  \item in Slick method toDouble is not a member of Int
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Shadow embedding (macros + types)}
+  The problem with modularity that stems from current implementation of macros
+  still affects shadow embedding
+
+  \vspace{1em}
+  \begin{semiverbatim}
+def idIsTen(c: Coffee) = c.id == 10
+
+slick \{
+  Query[Coffee] filter \text{\color{blue}{idIsTen}}
+\}
+  \end{semiverbatim}
+\end{frame}
+
+\begin{frame}{Our advice}
+  \begin{itemize}
+  \item Types work, but sometimes become too heavyweight\\
+        both for the DSL author and for the users
+  \item With macros a lot of traditional ceremony is unnecessary,\\
+        and that makes DSL development faster and more productive
+  \item But: Macros currently have inherent problems with modularity\\
+        (but we're working on it, see my tomorrow's talk!)
+  \item If you decide to go with macros, always try to document and encapsulate
+        macro magic with types as much as possible
+  \end{itemize}
 \end{frame}
 
   \section{Summary}
