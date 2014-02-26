@@ -420,7 +420,7 @@ for (c <- coffees if c.id == 10) yield c.name
 
 \begin{frame}[fragile]{Lifted embedding (types)}
   Encodes domain-specific notions in an extra layer of types:\\
-  columns of type \texttt{T} are represented as \texttt{Column[Int]}, etc
+  columns of type \texttt{T} are represented as \texttt{Column[T]}, etc
 
   \vspace{1em}
   \begin{semiverbatim}
