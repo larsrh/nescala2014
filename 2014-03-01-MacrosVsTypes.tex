@@ -128,7 +128,7 @@
 
   \vspace{1em}
   \begin{verbatim}
-def createArray[@specialized T](size: Int, el: T) = {
+def mkArray[@specialized T: ClassTag](size: Int, el: T) = {
   val a = new Array[T](size)
   for (i <- 0 until size) a(i) = el
   a
@@ -144,7 +144,7 @@ def createArray[@specialized T](size: Int, el: T) = {
   \begin{semiverbatim}
 def specialized[T: ClassTag](code: => T) = macro ...
 
-def createArray[T: ClassTag](size: Int, el: T) = \{
+def mkArray[T: ClassTag](size: Int, el: T) = \{
   val a = new Array[T](size)
   \text{\color{blue}{specialized[T] \{}}
     for (i <- 0 until size) a(i) = el
@@ -470,8 +470,11 @@ Query(Coffees) map (c =>
   \item Don’t know how to unpack Any to T and pack to G
   \item not enough arguments for method map: (implicit shape: scala.slick.lifted.Shape[Any,T,G])
   scala.slick.lifted.Query[G,T]. Unspecified value parameter
-  \item This happens because ifs aren't supported by lifted embedding
   \end{itemize}
+
+  \vspace{1em}
+  This happens because vanilla ifs aren't supported by lifted embedding,
+  but that doesn't follow from the error message
 \end{frame}
 
 \begin{frame}[fragile]{Direct embedding (macros)}
