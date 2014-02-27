@@ -99,6 +99,7 @@
   \begin{itemize}
     \item Easy to mess up when concatenating strings
     \item Little knowledge about the program being compiled
+    \item Needs to be hooked into the build process
     \item We need a better solution!
   \end{itemize}
 \end{frame}
@@ -154,10 +155,10 @@ def mkArray[T: ClassTag](size: Int, el: T) = \{
   \end{semiverbatim}
 \end{frame}
 
-\begin{frame}{Macros + types}
+\begin{frame}{What are types bringing into the mix?}
   \begin{itemize}
     \item With macros, code generation becomes accessible and fun
-    \item But: Macros are essentially opaque to the reader
+    \item But: Macros are essentially opaque to humans
     \item We can and should try to alleviate this with types
   \end{itemize}
 \end{frame}
@@ -239,7 +240,7 @@ implicit def derive[C[_] : \text{\color{blue}{TypeClass}}, T]: C[T] =
       (type classes and other advanced techniques really help here!)
     \item Try to limit the codegen surface encapsulating ``moving parts''\\
       (maybe more boilerplate, but more predictable)
-    \item Best practices for documentation \& testing are in the works
+    \item Needs best practices for documentation \& testing
   \end{itemize}
 \end{frame}
 
@@ -322,16 +323,18 @@ val rows = List(
   \end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{Let's overthrow the tyranny of types!}
-  Macros can do anything, including validation of arguments,
+\begin{frame}[fragile]
+\frametitle<1>{Let's overthrow the tyranny of types!}
+\frametitle<2>{Completely replacing types with macros: not a good idea}
+  Macros can do anything, including validation of arguments,\\
   so we shouldn't bother with all those complex types anymore
 
   \vspace{1em}
   \begin{alertblock}{Bad}
     \begin{verbatim}
 trait GenTraversableLike[+A, +Repr] {
-  def map[B, That](f: A => B)
-    (implicit bf: CanBuildFrom[Repr, B, That]): That
+  def map[B, R](f: A => B)
+    (implicit bf: CanBuildFrom[Repr, B, R]): R
 }
     \end{verbatim}
   \end{alertblock}
@@ -339,12 +342,12 @@ trait GenTraversableLike[+A, +Repr] {
   \begin{exampleblock}{Good}
     \begin{semiverbatim}
 trait GenTraversableLike \{
-  def map(f: Any => Any): Any = \text{\color{blue}{macro}} ...
+  def map(f: Any): Any = \text{\color{blue}{macro}} ...
 \}
     \end{semiverbatim}
   \end{exampleblock}
 
-  \begin{textblock*}{\textwidth}(20mm,10mm)
+  \begin{textblock*}{\textwidth}(15mm,10mm)
     \begin{visibleenv}<2->
       % from https://upload.wikimedia.org/wikipedia/commons/7/79/Operation_Upshot-Knothole_-_Badger_001.jpg
       \includegraphics[height=8cm]{img/boom.jpg}
@@ -374,24 +377,20 @@ Checked.option {
   \begin{itemize}
   \item For static checks use types whenever possible
   \item Macros if impossible or heavyweight
-  \item Try to document and encapsulate the magic
+  \item Try to document and encapsulate the magic using types\\
+        (type classes are particularly nice for this purpose)
   \end{itemize}
 \end{frame}
 
   \section{Domain-specific languages}
 
 \begin{frame}{Domain-specific languages}
-  As per classification from ``DSLs in Action'', domain-specific languages can be:
-
-  \vspace{1em}
+  As per ``DSLs in Action'':
   \begin{itemize}
-  \item Embedded aka internal
+  \item \text{\color<2>{blue}{Embedded aka internal}}\only<2>{\text{\color{blue}{ <- in this talk}}}
   \item Standalone aka external
   \item Non-textual
   \end{itemize}
-
-  \vspace{1em}
-  That's a lot of ground to cover in just one talk, so today we will focus on a single case study.
 \end{frame}
 
 \begin{frame}[fragile]{Use case: Slick}{An embedded DSL for data access}
@@ -418,11 +417,9 @@ for (c <- coffees if c.id == 10) yield c.name
   \end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{Lifted embedding (types)}
-  Encodes domain-specific notions in an extra layer of types:\\
-  columns of type \texttt{T} are represented as \texttt{Column[T]}, etc
-
+\begin{frame}[fragile]{Lifted embedding (types)}{Types can do domain-specific validation and virtualization}
   \vspace{1em}
+  \begin{exampleblock}{Domain rules are encoded in an extra layer of types}
   \begin{semiverbatim}
 object Coffees extends Table[\text{\color{blue}{(Int, String, ...)}}] \{
   def id = \text{\color{blue}{column}}[Int]("ID", O.PrimaryKey)
@@ -430,58 +427,56 @@ object Coffees extends Table[\text{\color{blue}{(Int, String, ...)}}] \{
   ...
 \}
   \end{semiverbatim}
-
-  This enables type-driven validation of domain rules
-  and virtualization of Scala code into SQL, but feels heavyweight
+  \end{exampleblock}
 \end{frame}
 
-\begin{frame}[fragile]{Lifted embedding (types)}
-  What you write in a Slick DSL:
+\begin{frame}[fragile]{Lifted embedding (types)}{Types are quite heavyweight under the covers}
   \vspace{1em}
-  \begin{verbatim}
+  \begin{exampleblock}{What you write in a Slick DSL}
+    \begin{verbatim}
 Query(Coffees) filter
   (c => c.id === 10) map
   (c => c.name)
-  \end{verbatim}
+)\end{verbatim}
+  \end{exampleblock}
 
-  What actually happens under the covers:
   \vspace{1em}
-  \begin{semiverbatim}
+  \begin{alertblock}{What actually happens under the covers}
+    \begin{semiverbatim}
 Query(Coffees) filter
   (c => c.id: \text{\color{blue}{Column[Int]}} === 10: \text{\color{blue}{Column[Int]}}) map
   (c => c.name: \text{\color{blue}{Column[String]}})
-  \end{semiverbatim}
+    \end{semiverbatim}
+  \end{alertblock}
 \end{frame}
 
-\begin{frame}[fragile]{Lifted embedding (types)}
-  Sometimes the illusion of seamless embedding breaks and
-  resulting error messages can be quite confusing
-
+\begin{frame}[fragile]{Lifted embedding (types)}{Types can be really bad at error message}
   \vspace{1em}
-  \begin{verbatim}
+  \begin{exampleblock}{Trying to compile}
+    \begin{verbatim}
 Query(Coffees) map (c =>
   if (c.origin === "Iran") "Good"
   else c.quality
 )\end{verbatim}
+  \end{exampleblock}
 
   \vspace{1em}
-  Compiling the code above produces these errors:
-  \begin{itemize}
-  \item Don’t know how to unpack Any to T and pack to G
-  \item not enough arguments for method map: (implicit shape: scala.slick.lifted.Shape[Any,T,G])
-  scala.slick.lifted.Query[G,T]. Unspecified value parameter
-  \end{itemize}
+  \begin{alertblock}{Produces the following error}
+    \begin{verbatim}
+Don't know how to unpack Any to T and pack to G
+not enough arguments for method map: (implicit shape:
+slick.lifted.Shape[Any,T,G]) slick.lifted.Query[G,T].
+Unspecified value parameter
+    \end{verbatim}
+  \end{alertblock}
 
-  \vspace{1em}
-  This happens because vanilla ifs aren't supported by lifted embedding,
-  but that doesn't follow from the error message
+  % This happens because vanilla ifs aren't supported by lifted embedding,
+  % but that doesn't follow from the error message
 \end{frame}
 
-\begin{frame}[fragile]{Direct embedding (macros)}
-  Macros like \texttt{filter} and \texttt{map} validate and virtualize Scala code,\\
-  type signatures are simple and error messages are to the point
-
+\begin{frame}[fragile]{Direct embedding (macros)}{Macros also can validate and virtualize Scala code}
   \vspace{1em}
+  \begin{exampleblock}{Type signatures are simple and error messages are to the point}
   \begin{semiverbatim}
 case class Coffee(id: Int, name: String, ...)
 
@@ -489,49 +484,35 @@ Query[Coffee] filter
   (c => c.id: \text{\color{blue}{Int}} == 10: \text{\color{blue}{Int}}) map
   (c => c.name: \text{\color{blue}{String}})
   \end{semiverbatim}
+  \end{exampleblock}
 \end{frame}
 
-\begin{frame}[fragile]{Direct embedding (macros)}
-  Macros can do whatever they want with the ASTs they get,
-  but macro authors need to ensure that this whatever is good enough
-
+\begin{frame}[fragile]{Direct embedding (macros)}{Macros can do static checks, but sometimes that non-trivial}
   \vspace{1em}
+  \begin{exampleblock}{Trying to use an unsupported feature}
   \begin{semiverbatim}
 Query[Coffee] map
-  (c => c.id\text{\color{blue}{.toDouble}})\end{semiverbatim}
-
-  \vspace{1em}
-  In case of direct embedding, its whatever isn't good enough:
-  \begin{itemize}
-  \item The snippet above compiles just fine
-  \item Crashes at runtime, because \texttt{toDouble} isn't supported by Slick
-  \end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]{Direct embedding (macros)}
-  Macros as they are implement now have an inherent problem with modularity,
-  because they don't see ASTs of the entire program
-
-  \vspace{1em}
-  \begin{exampleblock}{Good}
-    \begin{verbatim}
-Query[Coffee] filter (c => c.id == 10)\end{verbatim}
+  (c => c.id\text{\color{blue}{.toDouble}})
+  \end{semiverbatim}
   \end{exampleblock}
 
   \vspace{1em}
-  \begin{alertblock}{Bad}
-    \begin{semiverbatim}
-def idIsTen(c: Coffee) = c.id == 10
-Query[Coffee] filter \text{\color{blue}{idIsTen}}
-    \end{semiverbatim}
+  \begin{alertblock}{Crashes at runtime}
+  \vspace{1em}
+  This is what we get when we try to reinvent types
   \end{alertblock}
+
+  \begin{textblock*}{\textwidth}(15mm,10mm)
+    \begin{visibleenv}<2->
+      % from https://upload.wikimedia.org/wikipedia/commons/7/79/Operation_Upshot-Knothole_-_Badger_001.jpg
+      \includegraphics[height=8cm]{img/boom.jpg}
+    \end{visibleenv}
+  \end{textblock*}
 \end{frame}
 
-\begin{frame}[fragile]{Shadow embedding (macros + types)}
-  Based on YinYang, which uses macros, and that means that
-  type signatures stay simple and error messages are comprehensible
-
+\begin{frame}[fragile]{Shadow embedding (macros + types)}{Based on YinYang, which uses macros and therefore enjoys all their benefits}
   \vspace{1em}
+  \begin{exampleblock}{Type signatures are simple and error messages are to the point}
   \begin{semiverbatim}
 case class Coffee(id: Int, name: String, ...)
 
@@ -541,49 +522,47 @@ slick \{
     (c => c.name: \text{\color{blue}{String}})
   \}
 \}\end{semiverbatim}
+  \end{exampleblock}
 \end{frame}
 
-\begin{frame}[fragile]{Shadow embedding (macros + types)}
-  However the API that is available inside \texttt{slick} blocks
-  is moderated by the DSL author and then checked by the macro
-
+\begin{frame}[fragile]{Shadow embedding (macros + types)}{Uses types to moderate APIs available inside DSL blocks}
   \vspace{1em}
+  \begin{exampleblock}{DSL author specifies the set of available APIs using types}
   \begin{semiverbatim}
-  // In the Standard Library (front-end)
-  final abstract class Int private extends AnyVal \{
-    ...
-    def toDouble: Double
-    ...
-  \}
-  
-  // In the Lifted Embedding (back-end)
-  Value toDouble is not a member of Column[Int].
+// In Scala's standard library (front-end)
+final abstract class Int private extends AnyVal \{
+  ...
+  def toDouble: Double
+  ...
+\}
+
+// In Slick's lifted embedding (back-end)
+Value toDouble is not a member of Column[Int].
   \end{semiverbatim}
+  \end{exampleblock}
 \end{frame}
 
-\begin{frame}[fragile]{Shadow embedding (macros + types)}
-  By combining facilities for static checking provided by both macros and types,
-  we get comprehensible and comprehensive errors
-
+\begin{frame}[fragile]{Shadow embedding (macros + types)}{The best of two worlds}
   \vspace{1em}
+  \begin{exampleblock}{Trying to do something unsupported}
   \begin{semiverbatim}
 slick \{
   Query[Coffee] map
     (c => c.id\text{\color{blue}{.toDouble}})
 \}\end{semiverbatim}
+  \end{exampleblock}
 
   \vspace{1em}
-  Compiling the code above produces the correct error
-  \begin{itemize}
-  \item in Slick method toDouble is not a member of Int
-  \end{itemize}
+  \begin{exampleblock}{Produces comprehensible and comprehensive errors}
+  \begin{semiverbatim}
+in Slick method toDouble is not a member of Int
+  \end{semiverbatim}
+  \end{exampleblock}
 \end{frame}
 
-\begin{frame}[fragile]{Shadow embedding (macros + types)}
-  The problem with modularity that stems from current implementation of macros
-  still affects shadow embedding
-
+\begin{frame}[fragile]{Shadow embedding (macros + types)}{An important limitation of the current macro system}
   \vspace{1em}
+  \begin{alertblock}{Macros can't see ASTs of everything in the program}
   \begin{semiverbatim}
 def idIsTen(c: Coffee) = c.id == 10
 
@@ -591,6 +570,7 @@ slick \{
   Query[Coffee] filter \text{\color{blue}{idIsTen}}
 \}
   \end{semiverbatim}
+  \end{alertblock}
 \end{frame}
 
 \begin{frame}{Our advice}
@@ -600,7 +580,7 @@ slick \{
   \item With macros a lot of traditional ceremony is unnecessary,\\
         and that makes DSL development faster and more productive
   \item But: Macros currently have inherent problems with modularity\\
-        (but we're working on it, see my tomorrow's talk!)
+        (we're working on this, see my tomorrow's talk!)
   \item If you decide to go with macros, always try to document and encapsulate
         macro magic with types as much as possible
   \end{itemize}
@@ -632,14 +612,15 @@ slick \{
 \begin{frame}{Credits}
 
 \begin{itemize}
-\item Thanks to \text{\color{blue}\href{https://github.com/vjovanov/yin-yang}{Vojin Jovanovic}} and \text{\color{blue}\href{https://github.com/szeiger}{Stefan Zeiger}} for DSL help
 \item Thanks to \text{\color{blue}\href{https://github.com/amirsh/master-thesis}{Amir Shaikhha}} for the shadow embedding thesis
+\item Thanks to \text{\color{blue}\href{https://github.com/vjovanov/yin-yang}{Vojin Jovanovic}} and \text{\color{blue}\href{https://github.com/szeiger}{Stefan Zeiger}} for DSL help
+\item Thanks to \text{\color{blue}\href{https://github.com/densh}{Denys Shabalin}} and others for their comments
 \item Thanks to \text{\color{blue}\href{http://epaperpress.com/}{Tom Niemann}} for the parser generators diagram
 \item Thanks to \text{\color{blue}\href{https://secure.flickr.com/photos/mszeto/3261725397}{Flickr}} for the Hanoi towers picture
 \item Thanks to \text{\color{blue}\href{http://da.wallpapersus.com/magnetic-field/}{wallpapersus.com}} for the magnet picture
 \item Thanks to \text{\color{blue}\href{https://upload.wikimedia.org/wikipedia/commons/7/79/Operation_Upshot-Knothole_-_Badger_001.jpg}{Wikipedia}} for the nuclear explosion picture
 \item Thanks to \text{\color{blue}\href{http://newsicare.wordpress.com/2010/07/14/building-the-open-source-bussard-fusion-reactor}{Flickr}} for the fusion reactor picture
-\item Thanks to \text{\color{blue}\href{https://github.com/densh}{Denys Shabalin}} and others for their comments
+\item Thanks to you for reading and listening :)
 \end{itemize}
 \end{frame}
 
