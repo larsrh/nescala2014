@@ -235,7 +235,7 @@ implicit def derive[C[_] : \text{\color{blue}{TypeClass}}, T]: C[T] =
 
 \begin{frame}[fragile]{Our advice}
   \begin{itemize}
-    \item Macros are great, but may be hard to understand
+    \item Macros are great, but are essentially opaque to humans
     \item Try to document the codegen surface using types\\
       (type classes and other advanced techniques really help here!)
     \item Try to limit the codegen surface encapsulating ``moving parts''\\
