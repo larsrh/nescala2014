@@ -549,7 +549,15 @@ slick \{
 
   \vspace{1em}
   \begin{semiverbatim}
-  \text{\color{red}{Need an example from Vojin here}}
+  // In the Standard Library (front-end)
+  final abstract class Int private extends AnyVal \{
+    ...
+    def toDouble: Double
+    ...
+  \}
+  
+  // In the Lifted Embedding (back-end)
+  Value toDouble is not a member of Column[Int].
   \end{semiverbatim}
 \end{frame}
 
