@@ -157,7 +157,7 @@ def mkArray[T: ClassTag](size: Int, el: T) = \{
 
 \begin{frame}{What are types bringing into the mix?}
   \begin{itemize}
-    \item With macros, code generation becomes accessible and fun
+    \item Thanks to macros code generation becomes accessible and fun
     \item But: Macros are essentially opaque to humans
     \item We can and should try to alleviate this with types
   \end{itemize}
@@ -174,7 +174,7 @@ def mkArray[T: ClassTag](size: Int, el: T) = \{
   \vspace{1em}
   We do not want to: write boilerplate
   \begin{itemize}
-    \item repetitive \& error-prone
+    \item Repetitive \& error-prone
   \end{itemize}
 \end{frame}
 
@@ -450,7 +450,7 @@ Query(Coffees) filter
   \end{alertblock}
 \end{frame}
 
-\begin{frame}[fragile]{Lifted embedding (types)}{Types can be really bad at error message}
+\begin{frame}[fragile]{Lifted embedding (types)}{Types can be really bad at error messages}
   \vspace{1em}
   \begin{exampleblock}{Trying to compile}
     \begin{verbatim}
@@ -474,7 +474,7 @@ Unspecified value parameter
   % but that doesn't follow from the error message
 \end{frame}
 
-\begin{frame}[fragile]{Direct embedding (macros)}{Macros also can validate and virtualize Scala code}
+\begin{frame}[fragile]{Direct embedding (macros)}{Macros can also validate and virtualize Scala code}
   \vspace{1em}
   \begin{exampleblock}{Type signatures are simple and error messages are to the point}
   \begin{semiverbatim}
@@ -487,7 +487,7 @@ Query[Coffee] filter
   \end{exampleblock}
 \end{frame}
 
-\begin{frame}[fragile]{Direct embedding (macros)}{Macros can do static checks, but sometimes that non-trivial}
+\begin{frame}[fragile]{Direct embedding (macros)}{Macros can do static checks, but sometimes that's non-trivial to get right}
   \vspace{1em}
   \begin{exampleblock}{Trying to use an unsupported feature}
   \begin{semiverbatim}
@@ -510,7 +510,7 @@ Query[Coffee] map
   \end{textblock*}
 \end{frame}
 
-\begin{frame}[fragile]{Shadow embedding (macros + types)}{Based on YinYang, which uses macros and therefore enjoys all their benefits}
+\begin{frame}[fragile]{Shadow embedding (macros + types)}{Based on YinYang, which uses macros and therefore enjoys all benefits of macros}
   \vspace{1em}
   \begin{exampleblock}{Type signatures are simple and error messages are to the point}
   \begin{semiverbatim}
