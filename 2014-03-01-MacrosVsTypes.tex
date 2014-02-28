@@ -1,12 +1,31 @@
-\documentclass{beamer}
+%!TEX TS-program = xetex
+%!TEX encoding = UTF-8 Unicode
 
-\usepackage[english]{babel}
-\usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
+\documentclass[compress,xcolor={usenames,dvipsnames,table}]{beamer}
+
+\usepackage{xunicode}
+\usepackage{mathspec}
+\usepackage{xltxtra}
+
 \usepackage{tikz}
 \usepackage[overlay,absolute]{textpos}
 
+% Locale
+\usepackage{polyglossia}
+\setdefaultlanguage{english}
+
+% Fonts
+\defaultfontfeatures{Scale=MatchLowercase,Mapping=tex-text}
+\fontspec[BoldFont={Fira Sans OT}]{Fira Sans OT Light}
+\setmainfont[BoldFont={Fira Sans OT}]{Fira Sans OT Light}
+\setmathrm{Fira Sans OT Light}
+\setsansfont[BoldFont={Fira Sans OT}]{Fira Sans OT Light}
+\setmathsfont(Latin,Greek,Digits){Minion Pro}
+\setmonofont[BoldFont={Fira Mono OT}]{Fira Mono OT}
+
+% Theme
 \usetheme{nescala}
+\usefonttheme[onlylarge]{structurebold}
 \setbeamercovered{transparent}
 
 \newcommand\fullpicture[1]{
@@ -26,7 +45,7 @@
 
   \title{Macros vs Types}
   \author{Eugene Burmako \& Lars Hupel}
-  \institute{\'Ecole Polytechnique F\'ed\'erale de Lausanne\\Technische Universit\"at M\"unchen}
+  \institute{École Polytechnique Fédérale de Lausanne\\Technische Universität München}
   \date{March 1, 2014}
 
 {
@@ -65,7 +84,7 @@
   \begin{frame}
     \vskip40pt
     \begin{center}
-      \usebeamercolor[fg]{structure}{\Large{\insertsection}}
+      \bfseries\usebeamercolor[fg]{structure}{\Large{\insertsection}}
     \end{center}
   \end{frame}
 }
@@ -192,7 +211,7 @@ def mkArray[T: ClassTag](size: Int, el: T) = \{
   \end{exampleblock}
 \end{frame}
 
-\begin{frame}{Type classes \`a la Scala}
+\begin{frame}{Type classes à la Scala}
   \begin{itemize}
     \item Type classes are (first-class) traits
     \item Instances are (first-class) values
@@ -254,14 +273,14 @@ implicit def derive[C[_] : \text{\color{blue}{TypeClass}}, T]: C[T] =
 
   \section{Static checks}
 
-\begin{frame}{Types \`a la Pierce}
+\begin{frame}{Types à la Pierce}
   \begin{quote}
     ``A type system is a tractable syntactic method for \text{\color<2>{blue}{proving the absence of certain program behaviors}} by classifying phrases according to the kinds of values they compute.''
   \end{quote}
   \hfill -- Benjamin Pierce, in: Types and Programming Languages
 \end{frame}
 
-\begin{frame}{Types \`a la Scala}
+\begin{frame}{Types à la Scala}
   Scala has a sophisticated type system
   \begin{itemize}
     \item Path-dependent types
