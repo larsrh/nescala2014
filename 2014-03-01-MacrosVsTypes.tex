@@ -238,9 +238,9 @@ implicit def derive[C[_] : \text{\color{blue}{TypeClass}}, T]: C[T] =
     \item Macros are great, but are essentially opaque to humans
     \item Try to document the codegen surface using types\\
       (type classes and other advanced techniques really help here!)
-    \item Try to limit the codegen surface encapsulating ``moving parts''\\
+    \item Try to limit the codegen surface to just the ``moving parts''\\
       (maybe more boilerplate, but more predictable)
-    \item Needs best practices for documentation \& testing
+    \item We need best practices for documentation \& testing
   \end{itemize}
 \end{frame}
 
@@ -305,9 +305,7 @@ val rows = List(
   Computing with implicits is sometimes called ``Poor Man's Prolog''
   \vspace{1em}
 
-  But: Almost anything can be done
-
-  % TODO Not sure whether I follow
+  But: Despite the ``Poor Man's'' part, almost anything can be done
 \end{frame}
 
 % <https://secure.flickr.com/photos/mszeto/3261725397/>
@@ -315,11 +313,11 @@ val rows = List(
 
 \begin{frame}{What are macros bringing into the mix?}
   \begin{itemize}
-    \item Type system doesn't cover everything
     \item Complex type computations are hard to debug
 
       (sometimes, \texttt{-Xlog-implicits} is not enough)
-    \item Implicit-heavy code slows down compiler significantly
+    \item Complex type computations often slow down the compiler
+    \item Types don't cover everything, sometimes we need more power
   \end{itemize}
 \end{frame}
 
@@ -375,7 +373,7 @@ Checked.option {
 
 \begin{frame}{Our advice}
   \begin{itemize}
-  \item For static checks use types whenever possible
+  \item For static checks use types whenever practical
   \item Macros if impossible or heavyweight
   \item Try to document and encapsulate the magic using types\\
         (type classes are particularly nice for this purpose)
@@ -537,7 +535,7 @@ final abstract class Int private extends AnyVal \{
 \}
 
 // In Slick's lifted embedding (back-end)
-Value toDouble is not a member of Column[Int].
+value toDouble is not a member of Column[Int]
   \end{semiverbatim}
   \end{exampleblock}
 \end{frame}
