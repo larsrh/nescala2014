@@ -388,22 +388,22 @@ Checked.option {
 \begin{frame}{Domain-specific languages}
   As per ``DSLs in Action'':
   \begin{itemize}
-  \item \text{\color<2>{blue}{Embedded aka internal}}\only<2>{\text{\color{blue}{ <- in this talk}}}
-  \item Standalone aka external
-  \item Non-textual
+    \item \text{\color<2>{blue}{Embedded \emph{aka} internal}}\only<2>{\text{\color{blue}{ $\leftarrow$ in this talk}}}
+    \item Standalone \emph{aka} external
+    \item Non-textual
   \end{itemize}
 \end{frame}
 
 \begin{frame}[fragile]{Use case: Slick}{An embedded DSL for data access}
   \vspace{1em}
-  \begin{alertblock}{Instead of writing database code in SQL}
+  \begin{alertblock}{Bad: Writing database code in SQL}
     \begin{verbatim}
 select c.NAME from COFFEES c where c.ID = 10
     \end{verbatim}
   \end{alertblock}
 
   \vspace{1em}
-  \begin{exampleblock}{Write database code in Scala}
+  \begin{exampleblock}{Good: Writing database code in Scala}<visible@2>
     \begin{verbatim}
 for (c <- coffees if c.id == 10) yield c.name
     \end{verbatim}
@@ -412,15 +412,16 @@ for (c <- coffees if c.id == 10) yield c.name
 
 \begin{frame}{Three approaches}
   \begin{itemize}
-  \item Lifted embedding (types)
-  \item Direct embedding (macros)
-  \item Shadow embedding (macros + types)
+    \item Lifted embedding (types)
+    \item Direct embedding (macros)
+    \item Shadow embedding (macros + types)
   \end{itemize}
 \end{frame}
 
 \begin{frame}[fragile]{Lifted embedding (types)}{Types can do domain-specific validation and virtualization}
+  Domain rules are encoded in an extra layer of types
   \vspace{1em}
-  \begin{exampleblock}{Domain rules are encoded in an extra layer of types}
+
   \begin{semiverbatim}
 object Coffees extends Table[\text{\color{blue}{(Int, String, ...)}}] \{
   def id = \text{\color{blue}{column}}[Int]("ID", O.PrimaryKey)
@@ -428,7 +429,6 @@ object Coffees extends Table[\text{\color{blue}{(Int, String, ...)}}] \{
   ...
 \}
   \end{semiverbatim}
-  \end{exampleblock}
 \end{frame}
 
 \begin{frame}[fragile]{Lifted embedding (types)}{Types are quite heavyweight under the covers}
@@ -438,10 +438,10 @@ object Coffees extends Table[\text{\color{blue}{(Int, String, ...)}}] \{
 Query(Coffees) filter
   (c => c.id === 10) map
   (c => c.name)
-)\end{verbatim}
+)
+    \end{verbatim}
   \end{exampleblock}
 
-  \vspace{1em}
   \begin{alertblock}{What actually happens under the covers}
     \begin{semiverbatim}
 Query(Coffees) filter
@@ -449,6 +449,8 @@ Query(Coffees) filter
   (c => c.name: \text{\color{blue}{Column[String]}})
     \end{semiverbatim}
   \end{alertblock}
+
+  % TODO I'm not sure if that can actually be considered to be a "bad thing"
 \end{frame}
 
 \begin{frame}[fragile]{Lifted embedding (types)}{Types can be really bad at error messages}
@@ -478,29 +480,27 @@ Unspecified value parameter
 \begin{frame}[fragile]{Direct embedding (macros)}{Macros can also validate and virtualize Scala code}
   \vspace{1em}
   \begin{exampleblock}{Type signatures are simple and error messages are to the point}
-  \begin{semiverbatim}
+    \begin{semiverbatim}
 case class Coffee(id: Int, name: String, ...)
 
 Query[Coffee] filter
   (c => c.id: \text{\color{blue}{Int}} == 10: \text{\color{blue}{Int}}) map
   (c => c.name: \text{\color{blue}{String}})
-  \end{semiverbatim}
+    \end{semiverbatim}
   \end{exampleblock}
 \end{frame}
 
 \begin{frame}[fragile]{Direct embedding (macros)}{Macros can do static checks, but sometimes that's non-trivial to get right}
   \vspace{1em}
   \begin{exampleblock}{Trying to use an unsupported feature}
-  \begin{semiverbatim}
-Query[Coffee] map
-  (c => c.id\text{\color{blue}{.toDouble}})
-  \end{semiverbatim}
+    \begin{semiverbatim}
+Query[Coffee] map (c => c.id\text{\color{blue}{.toDouble}})
+    \end{semiverbatim}
   \end{exampleblock}
 
   \vspace{1em}
   \begin{alertblock}{Crashes at runtime}
-  \vspace{1em}
-  This is what we get when we try to reinvent types
+    This is what we get when we try to reinvent types
   \end{alertblock}
 
   \begin{textblock*}{\textwidth}(15mm,10mm)
@@ -514,7 +514,7 @@ Query[Coffee] map
 \begin{frame}[fragile]{Shadow embedding (macros + types)}{Based on YinYang, which uses macros and therefore enjoys all benefits of macros}
   \vspace{1em}
   \begin{exampleblock}{Type signatures are simple and error messages are to the point}
-  \begin{semiverbatim}
+    \begin{semiverbatim}
 case class Coffee(id: Int, name: String, ...)
 
 slick \{
@@ -522,14 +522,15 @@ slick \{
     (c => c.id: \text{\color{blue}{Int}} == 10: \text{\color{blue}{Int}}) map
     (c => c.name: \text{\color{blue}{String}})
   \}
-\}\end{semiverbatim}
+\}
+    \end{semiverbatim}
   \end{exampleblock}
 \end{frame}
 
 \begin{frame}[fragile]{Shadow embedding (macros + types)}{Uses types to moderate APIs available inside DSL blocks}
   \vspace{1em}
   \begin{exampleblock}{DSL author specifies the set of available APIs using types}
-  \begin{semiverbatim}
+    \begin{semiverbatim}
 // In Scala's standard library (front-end)
 final abstract class Int private extends AnyVal \{
   ...
@@ -539,51 +540,52 @@ final abstract class Int private extends AnyVal \{
 
 // In Slick's lifted embedding (back-end)
 Value toDouble is not a member of Column[Int].
-  \end{semiverbatim}
+    \end{semiverbatim}
   \end{exampleblock}
 \end{frame}
 
 \begin{frame}[fragile]{Shadow embedding (macros + types)}{The best of two worlds}
   \vspace{1em}
   \begin{exampleblock}{Trying to do something unsupported}
-  \begin{semiverbatim}
+    \begin{semiverbatim}
 slick \{
   Query[Coffee] map
     (c => c.id\text{\color{blue}{.toDouble}})
-\}\end{semiverbatim}
+\}
+    \end{semiverbatim}
   \end{exampleblock}
 
   \vspace{1em}
   \begin{exampleblock}{Produces comprehensible and comprehensive errors}
-  \begin{semiverbatim}
+    \begin{semiverbatim}
 in Slick method toDouble is not a member of Int
-  \end{semiverbatim}
+    \end{semiverbatim}
   \end{exampleblock}
 \end{frame}
 
 \begin{frame}[fragile]{Shadow embedding (macros + types)}{An important limitation of the current macro system}
   \vspace{1em}
   \begin{alertblock}{Macros can't see ASTs of everything in the program}
-  \begin{semiverbatim}
+    \begin{semiverbatim}
 def idIsTen(c: Coffee) = c.id == 10
 
 slick \{
   Query[Coffee] filter \text{\color{blue}{idIsTen}}
 \}
-  \end{semiverbatim}
+    \end{semiverbatim}
   \end{alertblock}
 \end{frame}
 
 \begin{frame}{Our advice}
   \begin{itemize}
-  \item Types work, but sometimes become too heavyweight\\
-        both for the DSL author and for the users
-  \item With macros a lot of traditional ceremony is unnecessary,\\
-        and that makes DSL development faster and more productive
-  \item But: Macros currently have inherent problems with modularity\\
-        (we're working on this, see my tomorrow's talk!)
-  \item If you decide to go with macros, always try to document and encapsulate
-        macro magic with types as much as possible
+    \item Types work, but sometimes become too heavyweight\\
+          both for the DSL author and for the users
+    \item With macros a lot of traditional ceremony is unnecessary,\\
+          and that makes DSL development faster and more productive
+    \item But: Macros currently have inherent problems with modularity\\
+          (we're working on this, see my tomorrow's talk!)
+    \item If you decide to go with macros, always try to document and encapsulate
+          macro magic with types as much as possible
   \end{itemize}
 \end{frame}
 
@@ -611,23 +613,16 @@ slick \{
 \end{frame}
 
 \begin{frame}{Credits}
-
-\begin{itemize}
-\item Thanks to \text{\color{blue}\href{https://github.com/amirsh/master-thesis}{Amir Shaikhha}} for the shadow embedding thesis
-\item Thanks to \text{\color{blue}\href{https://github.com/vjovanov/yin-yang}{Vojin Jovanovic}} and \text{\color{blue}\href{https://github.com/szeiger}{Stefan Zeiger}} for DSL help
-\item Thanks to \text{\color{blue}\href{https://github.com/densh}{Denys Shabalin}} and others for their comments
-\item Thanks to \text{\color{blue}\href{http://epaperpress.com/}{Tom Niemann}} for the parser generators diagram
-\item Thanks to \text{\color{blue}\href{https://secure.flickr.com/photos/mszeto/3261725397}{Flickr}} for the Hanoi towers picture
-\item Thanks to \text{\color{blue}\href{http://da.wallpapersus.com/magnetic-field/}{wallpapersus.com}} for the magnet picture
-\item Thanks to \text{\color{blue}\href{https://upload.wikimedia.org/wikipedia/commons/7/79/Operation_Upshot-Knothole_-_Badger_001.jpg}{Wikipedia}} for the nuclear explosion picture
-\item Thanks to \text{\color{blue}\href{http://newsicare.wordpress.com/2010/07/14/building-the-open-source-bussard-fusion-reactor}{Flickr}} for the fusion reactor picture
-\item Thanks to you for reading and listening :)
-\end{itemize}
+  \begin{itemize}
+    \item \text{\color{blue}\href{https://github.com/amirsh/master-thesis}{Amir Shaikhha}} for the shadow embedding thesis
+    \item \text{\color{blue}\href{https://github.com/vjovanov/yin-yang}{Vojin Jovanovic}} and \text{\color{blue}\href{https://github.com/szeiger}{Stefan Zeiger}} for DSL help
+    \item \text{\color{blue}\href{https://github.com/densh}{Denys Shabalin}} and others for their comments
+    \item \text{\color{blue}\href{http://epaperpress.com/}{Tom Niemann}} for the parser generators diagram
+    \item \text{\color{blue}\href{https://secure.flickr.com/photos/mszeto/3261725397}{Flickr}} for the Hanoi towers picture
+    \item \text{\color{blue}\href{http://da.wallpapersus.com/magnetic-field/}{wallpapersus.com}} for the magnet picture
+    \item \text{\color{blue}\href{https://upload.wikimedia.org/wikipedia/commons/7/79/Operation_Upshot-Knothole_-_Badger_001.jpg}{Wikipedia}} for the nuclear explosion picture
+    \item \text{\color{blue}\href{http://newsicare.wordpress.com/2010/07/14/building-the-open-source-bussard-fusion-reactor}{Flickr}} for the fusion reactor picture
+  \end{itemize}
 \end{frame}
-
-% TODO: we need to have a slide with credits:
-% * sources of images
-% * credits to Amir for his examples in the DSL section
-% * thanks to Denys, Vojin and Stefan for reviews
 
 \end{document}
