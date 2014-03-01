@@ -147,7 +147,7 @@
 There are a lot of ways to write pretty code...}
 \only<2>{But oftentimes pretty code is going to be slow, because of all the magic flying around, like in this case of typeclass-based design}
 \only<3>{There usually exist alternatives that provide great performance, but often they aren't as good-looking as we'd like them to be}
-\only<4>{However with macros you no longer have to choose -- macros can transform pretty solutions into fast code}
+\only<4>{With macros you no longer have to choose -- macros can transform pretty solutions into fast code}
 
   \begin{semiverbatim}
 import spire.algebra._
@@ -156,10 +156,10 @@ import spire.implicits._
 def nice[A: Ring](x: A, y: A): A =
   \text{\color<4>{blue}{(x + y) * z}}
 
-\only<2->{def desugared[A](x: A, y: A)(implicit ev: Ring[A]): A =
+\visible<2->{def desugared[A](x: A, y: A)(implicit ev: Ring[A]): A =
   \text{\color<2>{blue}{new RingOps(new RingOps(x)(ev).+(y))(ev).*(z) // slow!}}}
 
-\only<3->{def fast[A](x: A, y: A)(implicit ev: Ring[A]): A =
+\visible<3->{def fast[A](x: A, y: A)(implicit ev: Ring[A]): A =
   \text{\color<3>{blue}{ev.times(ev.plus(x, y), z) // fast, but not pretty!}}}
   \end{semiverbatim}
 \end{frame}
