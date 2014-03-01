@@ -143,17 +143,19 @@
 \end{frame}
 
 \begin{frame}[fragile]{Use case: Specialization}
-  Specialization helps with writing high-performance code,
-  but it bloats the code significantly
+  \begin{visibleenv}<2>
+    Specialization helps with writing high-performance code,
+    but it bloats the code significantly
+  \end{visibleenv}
 
   \vspace{1em}
-  \begin{verbatim}
-def mkArray[@specialized T: ClassTag](size: Int, el: T) = {
+  \begin{semiverbatim}
+def mkArray[\only<2>{\text{\color{blue}@specialized }}T: ClassTag](size: Int, el: T) = \{
   val a = new Array[T](size)
   for (i <- 0 until size) a(i) = el
   a
-}
-  \end{verbatim}
+\}
+  \end{semiverbatim}
 \end{frame}
 
 \begin{frame}[fragile]{Use case: Specialization}
@@ -375,6 +377,7 @@ trait GenTraversableLike \{
 
 \begin{frame}[fragile]{Reasonable use case: Checked arithmetics}
   Spire provides a \texttt{checked} macro to detect arithmetic overflows
+
   Types can't capture this, so it's okay to use a macro here
 
   \vspace{1em}
@@ -600,7 +603,7 @@ slick \{
     \item With macros a lot of traditional ceremony is unnecessary,\\
           and that makes DSL development faster and more productive
     \item But: Macros currently have inherent problems with modularity\\
-          (we're working on this, see my tomorrow's talk!)
+          (we're working on this)
     \item If you decide to go with macros, always try to document and encapsulate
           macro magic with types as much as possible
   \end{itemize}
@@ -637,7 +640,7 @@ slick \{
     \item \text{\color{blue}\href{http://epaperpress.com/}{Tom Niemann}} for the parser generators diagram
     \item \text{\color{blue}\href{https://secure.flickr.com/photos/mszeto/3261725397}{Flickr}} for the Hanoi towers picture
     \item \text{\color{blue}\href{http://da.wallpapersus.com/magnetic-field/}{wallpapersus.com}} for the magnet picture
-    \item \text{\color{blue}\href{https://upload.wikimedia.org/wikipedia/commons/7/79/Operation_Upshot-Knothole_-_Badger_001.jpg}{Wikimedia Common}} for the nuclear explosion picture
+    \item \text{\color{blue}\href{https://upload.wikimedia.org/wikipedia/commons/7/79/Operation_Upshot-Knothole_-_Badger_001.jpg}{Wikimedia Commons}} for the nuclear explosion picture
     \item \text{\color{blue}\href{http://newsicare.wordpress.com/2010/07/14/building-the-open-source-bussard-fusion-reactor}{Flickr}} for the fusion reactor picture
   \end{itemize}
 \end{frame}
