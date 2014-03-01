@@ -142,37 +142,25 @@
   \end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{Use case: Specialization}
-  \begin{visibleenv}<2>
-    Specialization helps with writing high-performance code,
-    but it bloats the code significantly
-  \end{visibleenv}
+\begin{frame}[fragile]{Use case: Spire Ops}
+\only<1>{This is a typical situation with high-level abstractions in Scala\\
+There are a lot of ways to write pretty code...}
+\only<2>{But oftentimes pretty code is going to be slow, because of all the magic flying around, like in this case of typeclass-based design}
+\only<3>{There usually exist alternatives that provide great performance, but often they aren't as good-looking as we'd like them to be}
+\only<4>{However with macros you no longer have to choose -- macros can transform pretty solutions into fast code}
 
-  \vspace{1em}
   \begin{semiverbatim}
-def mkArray[\only<2>{\text{\color{blue}@specialized }}T: ClassTag](size: Int, el: T) = \{
-  val a = new Array[T](size)
-  for (i <- 0 until size) a(i) = el
-  a
-\}
-  \end{semiverbatim}
-\end{frame}
+import spire.algebra._
+import spire.implicits._
 
-\begin{frame}[fragile]{Use case: Specialization}
-  With macros we can write a specialization code generator ourselves,
-  having fine-grained control over what we're specializing
+def nice[A: Ring](x: A, y: A): A =
+  \text{\color<4>{blue}{(x + y) * z}}
 
-  \vspace{1em}
-  \begin{semiverbatim}
-def specialized[T: ClassTag](code: => T) = macro ...
+\only<2->{def desugared[A](x: A, y: A)(implicit ev: Ring[A]): A =
+  \text{\color<2>{blue}{new RingOps(new RingOps(x)(ev).+(y))(ev).*(z) // slow!}}}
 
-def mkArray[T: ClassTag](size: Int, el: T) = \{
-  val a = new Array[T](size)
-  \text{\color{blue}{specialized[T] \{}}
-    for (i <- 0 until size) a(i) = el
-  \text{\color{blue}{\}}}
-  a
-\}
+\only<3->{def fast[A](x: A, y: A)(implicit ev: Ring[A]): A =
+  \text{\color<3>{blue}{ev.times(ev.plus(x, y), z) // fast, but not pretty!}}}
   \end{semiverbatim}
 \end{frame}
 
