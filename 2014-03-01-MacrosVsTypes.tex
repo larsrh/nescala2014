@@ -389,6 +389,22 @@ Checked.option {
   \end{verbatim}
 \end{frame}
 
+\begin{frame}[fragile]{Reasonable use case: WartRemover}
+  @puffnfresh has written a flexible Scala code linting tool\\
+  that can alert one about questionable coding practices
+
+  \vspace{1em}
+  \begin{verbatim}
+scala> def safe(expr: Any) = macro Unsafe.asMacro
+safe: (expr: Any)Any
+
+scala> safe { null }
+<console>:10: error: null is disabled
+              safe { null }
+                     ^
+  \end{verbatim}
+\end{frame}
+
 % TODO
 %\begin{frame}{Reasonable use case: Example of short-circuiting computations with macros}
 %  What would be the best example from shapeless here?
@@ -625,7 +641,14 @@ slick \{
   \end{center}
 \end{frame}
 
-\begin{frame}[fragile]{Use whatever's simpler, try combining strong points of both}
+\begin{frame}[fragile]{Embrace reason, use whatever's simpler}
+  \begin{center}
+    % from internet
+    \includegraphics[height=8cm]{img/spock.jpg}
+  \end{center}
+\end{frame}
+
+\begin{frame}[fragile]{Also try combining strong points of both}
   \begin{center}
     % from http://newsicare.wordpress.com/2010/07/14/building-the-open-source-bussard-fusion-reactor/
     \includegraphics[height=6.5cm]{img/fusion.jpg}
@@ -642,6 +665,7 @@ slick \{
     \item \text{\color{blue}\href{http://da.wallpapersus.com/magnetic-field/}{wallpapersus.com}} for the magnet picture
     \item \text{\color{blue}\href{https://upload.wikimedia.org/wikipedia/commons/7/79/Operation_Upshot-Knothole_-_Badger_001.jpg}{Wikimedia Commons}} for the nuclear explosion picture
     \item \text{\color{blue}\href{http://newsicare.wordpress.com/2010/07/14/building-the-open-source-bussard-fusion-reactor}{Flickr}} for the fusion reactor picture
+    \item \text{\color{blue}\href{http://en.wikipedia.org/wiki/Star_Trek}{Star Trek}} for the picture of Spock
   \end{itemize}
 \end{frame}
 
